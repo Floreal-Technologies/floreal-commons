@@ -1,0 +1,71 @@
+cabal-version: 3.4
+name: floreal-commons
+version: 0.1.0.0
+synopsis: Code that the Floreal programs share
+license: GPL-3.0-only
+license-file: LICENSE
+build-type: Simple
+tested-with: ghc ==9.14.1
+
+common options
+  default-language: GHC2024
+  default-extensions:
+    OverloadedStrings
+    QuasiQuotes
+
+  ghc-options:
+    -Wall
+    -Wcompat
+    -Widentities
+    -Wincomplete-record-updates
+    -Wincomplete-uni-patterns
+    -Wpartial-fields
+    -Wredundant-constraints
+    -fhide-source-paths
+    -Wno-unused-do-bind
+    -fshow-hole-constraints
+    -Wno-unticked-promoted-constructors
+
+  build-depends:
+    base >=4.22 && <5,
+    floreal-prelude,
+
+  mixins:
+    base hiding (Prelude),
+    floreal-prelude (Floreal.Commons.Prelude as Prelude),
+
+library
+  import: options
+  hs-source-dirs: src
+  exposed-modules:
+    Floreal.Commons.Exception
+    Floreal.Commons.Log
+    Floreal.Commons.Signals
+    Floreal.Commons.Xdg
+
+  build-depends:
+    effectful ^>=2.7,
+    effectful-core ^>=2.7,
+    filepath ^>=1.5,
+    log-base ^>=0.12,
+    log-effectful ^>=1.0,
+    text ^>=2.1,
+
+  if os(windows)
+    hs-source-dirs: src-windows
+  else
+    hs-source-dirs: src-posix
+    build-depends: unix ^>=2.8
+
+-- The GLib main loop. A library of its own, so that a program without
+-- GLib does not depend on it.
+library gi
+  import: options
+  visibility: public
+  hs-source-dirs: gi
+  exposed-modules: Floreal.Commons.GLib.MainLoop
+  build-depends:
+    effectful-core,
+    floreal-commons,
+    gi-glib ^>=2.0.30,
+    log-effectful,

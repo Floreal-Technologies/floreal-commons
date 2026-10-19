@@ -1,0 +1,15 @@
+packages:
+  floreal-prelude
+  floreal-commons
+
+with-compiler: ghc-9.14.1
+
+tests: True
+
+semaphore: True
+
+jobs: $ncpus
+
+write-ghc-environment-files: always
+
+index-state: hackage.haskell.org 2026-10-01T20:48:17Z

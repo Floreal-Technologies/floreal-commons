@@ -1,0 +1,37 @@
+cabal-version: 3.4
+name: floreal-prelude
+version: 0.1.0.0
+synopsis: The Prelude of the Floreal programs
+license: GPL-3.0-only
+license-file: LICENSE
+build-type: Simple
+tested-with: ghc ==9.14.1
+
+common options
+  default-language: GHC2024
+  ghc-options:
+    -Wall
+    -Wcompat
+    -Widentities
+    -Wincomplete-record-updates
+    -Wincomplete-uni-patterns
+    -Wpartial-fields
+    -Wredundant-constraints
+    -fhide-source-paths
+    -Wno-unused-do-bind
+    -fshow-hole-constraints
+    -Wno-unticked-promoted-constructors
+
+library
+  import: options
+  hs-source-dirs: src
+  exposed-modules: Floreal.Commons.Prelude
+  build-depends:
+    base >=4.22 && <5,
+    bytestring ^>=0.12,
+    containers ^>=0.8,
+    effectful-core ^>=2.7,
+    filepath ^>=1.5,
+    text ^>=2.1,
+    text-display ^>=1.0,
+    vector ^>=0.13,
