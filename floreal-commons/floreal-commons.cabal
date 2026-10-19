@@ -40,16 +40,20 @@ library
   exposed-modules:
     Floreal.Commons.Exception
     Floreal.Commons.Log
+    Floreal.Commons.Palette
     Floreal.Commons.Signals
     Floreal.Commons.Xdg
 
   build-depends:
+    containers ^>=0.8,
     effectful ^>=2.7,
     effectful-core ^>=2.7,
     filepath ^>=1.5,
     log-base ^>=0.12,
     log-effectful ^>=1.0,
     text ^>=2.1,
+    unicode-transforms ^>=0.4,
+    vector ^>=0.13,
 
   if os(windows)
     hs-source-dirs: src-windows
@@ -57,8 +61,6 @@ library
     hs-source-dirs: src-posix
     build-depends: unix ^>=2.8
 
--- The GLib main loop. A library of its own, so that a program without
--- GLib does not depend on it.
 library gi
   import: options
   visibility: public
@@ -69,3 +71,27 @@ library gi
     floreal-commons,
     gi-glib ^>=2.0.30,
     log-effectful,
+
+library gtk
+  import: options
+  visibility: public
+  hs-source-dirs: gtk
+  exposed-modules:
+    Floreal.Commons.Gtk.Bind
+    Floreal.Commons.Gtk.CommandPalette
+    Floreal.Commons.Gtk.Common
+
+  build-depends:
+    floreal-commons,
+    gi-adwaita ^>=1.0.8,
+    gi-gdk4 ^>=4.0.10,
+    gi-glib ^>=2.0.30,
+    gi-gobject ^>=2.0.31,
+    gi-gtk4 ^>=4.0.12,
+    haskell-gi-base ^>=0.26.9,
+    text ^>=2.1,
+    vector ^>=0.13,
+
+  pkgconfig-depends:
+    gtk4 >=4.14,
+    libadwaita-1 >=1.5,
