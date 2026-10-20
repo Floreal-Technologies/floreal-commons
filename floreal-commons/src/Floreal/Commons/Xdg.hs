@@ -1,22 +1,39 @@
+{-# LANGUAGE TypeFamilies #-}
+
 module Floreal.Commons.Xdg
-  ( XdgDirectory (..)
+  ( Xdg (..)
+  , XdgDirectory (..)
+  , XdgDirectoryList (..)
+  , getXdgDirectory
+  , getXdgDirectoryList
   , appPath
-  , createAppDirectory
+  , runXdgIO
   ) where
 
-import Effectful.FileSystem (FileSystem)
-import Effectful.FileSystem.OsPath (XdgDirectory (..), createDirectoryIfMissing, getXdgDirectory)
+import Effectful (Dispatch (Dynamic), DispatchOf)
+import Effectful.Dispatch.Dynamic (interpret_, send)
+import System.Directory.OsPath (XdgDirectory (..), XdgDirectoryList (..))
+import System.Directory.OsPath qualified as Directory
 import System.OsPath ((</>))
+
+data Xdg :: Effect where
+  GetXdgDirectory :: XdgDirectory -> OsPath -> Xdg m OsPath
+  GetXdgDirectoryList :: XdgDirectoryList -> Xdg m (List OsPath)
+
+type instance DispatchOf Xdg = Dynamic
+
+getXdgDirectory :: (Xdg :> es) => XdgDirectory -> OsPath -> Eff es OsPath
+getXdgDirectory kind program = send (GetXdgDirectory kind program)
+
+getXdgDirectoryList :: (Xdg :> es) => XdgDirectoryList -> Eff es (List OsPath)
+getXdgDirectoryList kind = send (GetXdgDirectoryList kind)
 
 -- | A path in the XDG directory of a program, for example
 -- @appPath XdgState [osp|mediacopy3000|] [osp|jobs|]@.
-appPath :: (FileSystem :> es) => XdgDirectory -> OsPath -> OsPath -> Eff es OsPath
-appPath kind program path = (</> path) <$> getXdgDirectory kind program
+appPath :: (Xdg :> es) => XdgDirectory -> OsPath -> OsPath -> Eff es OsPath
+appPath kind program path = getXdgDirectory kind program <&> (</> path)
 
--- | 'appPath' for a directory. The directory and its parents are
--- created if they are missing.
-createAppDirectory :: (FileSystem :> es) => XdgDirectory -> OsPath -> OsPath -> Eff es OsPath
-createAppDirectory kind program path = do
-  directory <- appPath kind program path
-  createDirectoryIfMissing True directory
-  pure directory
+runXdgIO :: (IOE :> es) => Eff (Xdg : es) a -> Eff es a
+runXdgIO = interpret_ $ \case
+  GetXdgDirectory kind program -> liftIO (Directory.getXdgDirectory kind program)
+  GetXdgDirectoryList kind -> liftIO (Directory.getXdgDirectoryList kind)
