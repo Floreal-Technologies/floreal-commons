@@ -102,5 +102,5 @@ library gtk
     vector ^>=0.13,
 
   pkgconfig-depends:
-    gtk4 >=4.14,
-    libadwaita-1 >=1.5,
+    gtk4 >=4.20,
+    libadwaita-1 >=1.6,
